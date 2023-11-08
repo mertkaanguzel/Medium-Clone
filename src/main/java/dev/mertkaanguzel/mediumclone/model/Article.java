@@ -1,6 +1,9 @@
 package dev.mertkaanguzel.mediumclone.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -11,9 +14,11 @@ public class Article {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
-    private User user;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private UserAccount user;
 
     private String slug;
     private String title;
@@ -23,7 +28,9 @@ public class Article {
     private LocalDateTime updatedAt;
     private Integer favoritesCount;
 
-    public Article(String slug, String title, String description, String body, LocalDateTime createdAt, LocalDateTime updatedAt, Integer favoritesCount) {
+    public Article(UserAccount user, String slug, String title, String description, String body, LocalDateTime createdAt, LocalDateTime updatedAt, Integer favoritesCount) {
+        this.id = null;
+        this.user = user;
         this.slug = slug;
         this.title = title;
         this.description = description;
@@ -35,6 +42,7 @@ public class Article {
 
     protected Article() {
     }
+
 
     public Long getId() {
         return id;
@@ -100,23 +108,32 @@ public class Article {
         this.favoritesCount = favoritesCount;
     }
 
+    public UserAccount getUser() {
+        return user;
+    }
+
+    public void setUser(UserAccount user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Article article = (Article) o;
-        return Objects.equals(id, article.id) && Objects.equals(slug, article.slug) && Objects.equals(title, article.title) && Objects.equals(description, article.description) && Objects.equals(body, article.body) && Objects.equals(createdAt, article.createdAt) && Objects.equals(updatedAt, article.updatedAt) && Objects.equals(favoritesCount, article.favoritesCount);
+        return Objects.equals(id, article.id) && Objects.equals(user, article.user) && Objects.equals(slug, article.slug) && Objects.equals(title, article.title) && Objects.equals(description, article.description) && Objects.equals(body, article.body) && Objects.equals(createdAt, article.createdAt) && Objects.equals(updatedAt, article.updatedAt) && Objects.equals(favoritesCount, article.favoritesCount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, slug, title, description, body, createdAt, updatedAt, favoritesCount);
+        return Objects.hash(id, user, slug, title, description, body, createdAt, updatedAt, favoritesCount);
     }
 
     @Override
     public String toString() {
         return "Article{" +
                 "id=" + id +
+                ", user=" + user +
                 ", slug='" + slug + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +

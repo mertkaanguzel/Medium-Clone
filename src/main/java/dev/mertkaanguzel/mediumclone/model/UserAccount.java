@@ -1,19 +1,16 @@
 package dev.mertkaanguzel.mediumclone.model;
 
 import jakarta.persistence.*;
-
-import java.util.HashSet;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
-public class User {
+public class UserAccount {
     @Id
     @GeneratedValue
     private Long id;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private Set<Article> articles = new HashSet<>();
 
     private String username;
     private String password;
@@ -21,7 +18,8 @@ public class User {
     private String bio;
     private String image;
 
-    public User(String username, String password, String email, String bio, String image) {
+    public UserAccount(String username, String password, String email, String bio, String image) {
+        this.id = null;
         this.username = username;
         this.password = password;
         this.email = email;
@@ -29,7 +27,14 @@ public class User {
         this.image = image;
     }
 
-    protected User() {
+    protected UserAccount() {
+    }
+
+    public UserDetails asUser() {
+        return  User
+                .withUsername(getUsername())
+                .password(new BCryptPasswordEncoder(16).encode(getPassword()))
+                .build();
     }
 
     public void setId(Long id) {
@@ -85,7 +90,7 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
+        UserAccount user = (UserAccount) o;
         return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(bio, user.bio) && Objects.equals(image, user.image);
     }
 
