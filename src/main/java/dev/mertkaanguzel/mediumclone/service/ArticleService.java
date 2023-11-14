@@ -4,6 +4,7 @@ import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.ArticleRepository;
+import dev.mertkaanguzel.mediumclone.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +35,11 @@ public class ArticleService {
         return articleRepository.saveAndFlush(article);
     }
 
-    public Article getArticleBySlug(String slug) {
-        return articleRepository.getArticleBySlug(slug);
+    public Article getArticleBySlug(String slug, String username) {
+        UserAccount author = userService.getUserByUserName(username);
+        Article article = articleRepository.getArticleBySlug(slug);
+        article.setUser(author);
+        return article;
     }
 /*
     @PostConstruct

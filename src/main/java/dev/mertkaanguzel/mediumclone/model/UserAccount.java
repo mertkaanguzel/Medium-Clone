@@ -1,5 +1,6 @@
 package dev.mertkaanguzel.mediumclone.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.User;
@@ -13,7 +14,9 @@ public class UserAccount {
     private Long id;
 
     private String username;
+    @JsonIgnore
     private String password;
+
     private String email;
     private String bio;
     private String image;
@@ -33,7 +36,8 @@ public class UserAccount {
     public UserDetails asUser() {
         return  User
                 .withUsername(getUsername())
-                .password(new BCryptPasswordEncoder(16).encode(getPassword()))
+                .password("{noop}" + getPassword()) //new BCryptPasswordEncoder(16).encode(getPassword())
+                .authorities("ROLE_USER") // just one role for sake of jwt
                 .build();
     }
 
