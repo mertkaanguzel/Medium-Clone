@@ -19,6 +19,9 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -39,7 +42,7 @@ public class SecurityConfig {
     @Bean
     CommandLineRunner initUsers(UserRepository repository) {
         return args -> {
-            repository.save(new UserAccount("john", "doe", "john@doe", "Hey", "example.com"));
+            repository.save(new UserAccount("john", passwordEncoder().encode("doe"), "john@doe", "Hey", "example.com"));
         };
     }
 
@@ -47,20 +50,22 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
         var authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(authProvider);
     }
 
     @Bean
     UserDetailsService userDetailsService(UserManagementRepository repo) {
         //return username -> repo.findByUsername(username).asUser();
-        return email -> repo.findByEmail(email).asUser();
+        return email -> repo.findByEmail(email).
+                orElseThrow(() -> new UsernameNotFoundException("User not found with given email: " + email)).asUser();
     }
-/*
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-*/
+
 
     @Bean
     MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {

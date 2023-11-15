@@ -36,7 +36,7 @@ public class UserAccount {
     public UserDetails asUser() {
         return  User
                 .withUsername(getUsername())
-                .password("{noop}" + getPassword()) //new BCryptPasswordEncoder(16).encode(getPassword())
+                .password(/*"{noop}" + */getPassword()) //new BCryptPasswordEncoder(16).encode(getPassword())
                 .authorities("ROLE_USER") // just one role for sake of jwt
                 .build();
     }

@@ -2,11 +2,13 @@ package dev.mertkaanguzel.mediumclone.service;
 
 import dev.mertkaanguzel.mediumclone.dto.ArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
+import dev.mertkaanguzel.mediumclone.exception.ArticleNotFoundException;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.ArticleRepository;
 import dev.mertkaanguzel.mediumclone.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,7 +42,8 @@ public class ArticleService {
         //UserAccount author = userService.getUserByUserName(username);
         //Article article = articleRepository.getArticleBySlug(slug);
         //article.setUser(author);
-        Article article = articleRepository.getArticleWithAuthorBySlug(slug);
+        Article article = articleRepository.getArticleWithAuthorBySlug(slug)
+                .orElseThrow(() -> new ArticleNotFoundException("Article not found with given slug: " + slug));
         return ArticleDto.fromArticle(article);
     }
 /*

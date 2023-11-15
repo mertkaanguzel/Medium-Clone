@@ -16,11 +16,11 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    //private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository/*, PasswordEncoder passwordEncoder*/) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        //this.passwordEncoder = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserAccount getUserByUserName(String username) {
@@ -37,7 +37,7 @@ public class UserService {
     public UserAccount createUser(CreateUserDto createUserDto) {
         UserAccount user = new UserAccount(
                 createUserDto.username(),
-                createUserDto.password(),//passwordEncoder.encode(createUserDto.password()),
+                passwordEncoder.encode(createUserDto.password()),
                 createUserDto.email(),
                 null,
                 null);
@@ -63,7 +63,7 @@ public class UserService {
         */
         if (updateUserDto.email() != null) user.setEmail(updateUserDto.email());
         if (updateUserDto.username() != null) user.setUsername(updateUserDto.username());
-        if (updateUserDto.password() != null) user.setPassword(updateUserDto.password());
+        if (updateUserDto.password() != null) user.setPassword(passwordEncoder.encode(updateUserDto.password()));
         if (updateUserDto.image() != null) user.setImage(updateUserDto.image());
         if (updateUserDto.bio() != null) user.setBio(updateUserDto.bio());
 
