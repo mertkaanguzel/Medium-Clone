@@ -1,4 +1,12 @@
 package dev.mertkaanguzel.mediumclone.dto;
 
-public record CreateUserDto(String username, String email, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record CreateUserDto(
+        @NotBlank(message = "Username must not be empty")
+        String username,
+        @NotBlank(message = "Email must not be empty")
+        String email,
+        @NotBlank(message = "Password must not be empty")
+        String password) {
 }

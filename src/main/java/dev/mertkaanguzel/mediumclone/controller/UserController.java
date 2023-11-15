@@ -1,9 +1,13 @@
 package dev.mertkaanguzel.mediumclone.controller;
 
 import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
+import dev.mertkaanguzel.mediumclone.dto.LoginDto;
+import dev.mertkaanguzel.mediumclone.dto.UpdateUserDto;
+import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -24,12 +28,23 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<String> getUser(/*Principal principal*/) {
+    public ResponseEntity<UserDto> getUser(Principal principal) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         String token = jwtAuthenticationToken.getToken().getTokenValue();
-        //return ResponseEntity.ok(userService.getUserByUserName(principal.getName()));
-        return ResponseEntity.ok("token: " + token);
+
+        return ResponseEntity.ok(UserDto.fromUserAccount(userService.getUserByUserName(principal.getName()), token));
+
+    }
+
+    //??? @PreAuthorize("#entity.username == authentication.name") //?????
+    @PutMapping
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UpdateUserDto updateUserDto, Principal principal) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
+        String token = jwtAuthenticationToken.getToken().getTokenValue();
+
+        return ResponseEntity.ok(UserDto.fromUserAccount(userService.updateUser(updateUserDto, principal.getName()), token));
 
     }
 }

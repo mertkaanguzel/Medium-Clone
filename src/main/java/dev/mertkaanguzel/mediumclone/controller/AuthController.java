@@ -2,9 +2,11 @@ package dev.mertkaanguzel.mediumclone.controller;
 
 import dev.mertkaanguzel.mediumclone.dto.CreateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.LoginDto;
+import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.service.AuthService;
 import dev.mertkaanguzel.mediumclone.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,13 +30,17 @@ public class AuthController {
     }
 
     @PostMapping
-    public ResponseEntity<UserAccount> register(@RequestBody CreateUserDto createUserDto) {
-        return ResponseEntity.ok(userService.createUser(createUserDto));
+    public ResponseEntity<UserDto> register(@Valid @RequestBody CreateUserDto createUserDto) {
+        UserAccount user = userService.createUser(createUserDto);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(createUserDto.email(), createUserDto.password()));
+        UserDto userDto = UserDto.fromUserAccount(user, authService.generateToken(authentication));
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<UserDto> login(@Valid @RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password()));
-        return ResponseEntity.ok(authService.generateToken(authentication));
+
+        return ResponseEntity.ok(userService.findByUserName(authentication.getName(), authService.generateToken(authentication)));
     }
 }

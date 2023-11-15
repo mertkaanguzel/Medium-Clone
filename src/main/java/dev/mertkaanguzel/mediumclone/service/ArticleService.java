@@ -1,5 +1,6 @@
 package dev.mertkaanguzel.mediumclone.service;
 
+import dev.mertkaanguzel.mediumclone.dto.ArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
@@ -20,10 +21,10 @@ public class ArticleService {
         this.userService = userService;
     }
 
-    public Article createArticle(CreateArticleDto createArticleDto, String username) {
+    public ArticleDto createArticle(CreateArticleDto createArticleDto, String username) {
         Article article = new Article(
                 userService.getUserByUserName(username),
-                createArticleDto.slug(),
+                createArticleDto.title().toLowerCase().replace(" ", "-"),
                 createArticleDto.title(),
                 createArticleDto.description(),
                 createArticleDto.body(),
@@ -32,14 +33,15 @@ public class ArticleService {
                 0
         );
 
-        return articleRepository.saveAndFlush(article);
+        return ArticleDto.fromArticle(articleRepository.saveAndFlush(article));
     }
 
-    public Article getArticleBySlug(String slug, String username) {
-        UserAccount author = userService.getUserByUserName(username);
-        Article article = articleRepository.getArticleBySlug(slug);
-        article.setUser(author);
-        return article;
+    public ArticleDto getArticleBySlug(String slug, String username) {
+        //UserAccount author = userService.getUserByUserName(username);
+        //Article article = articleRepository.getArticleBySlug(slug);
+        //article.setUser(author);
+        Article article = articleRepository.getArticleWithAuthorBySlug(slug);
+        return ArticleDto.fromArticle(article);
     }
 /*
     @PostConstruct
