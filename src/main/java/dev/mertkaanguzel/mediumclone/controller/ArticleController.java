@@ -2,6 +2,7 @@ package dev.mertkaanguzel.mediumclone.controller;
 
 import dev.mertkaanguzel.mediumclone.dto.ArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
+import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.repository.UserRepository;
 import dev.mertkaanguzel.mediumclone.service.ArticleService;
@@ -21,12 +22,26 @@ public class ArticleController {
     }
 
     @PostMapping
-    public ResponseEntity<ArticleDto> createArticle(@Valid @RequestBody CreateArticleDto createArticleDto, Principal principal) {
+    public ResponseEntity<ArticleDto> createArticle(@Valid @RequestBody CreateArticleDto createArticleDto,
+                                                    Principal principal) {
         return ResponseEntity.ok(articleService.createArticle(createArticleDto, principal.getName()));
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable String slug, Principal principal) {
-        return ResponseEntity.ok(articleService.getArticleBySlug(slug, principal.getName()));
+    public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(articleService.findBySlug(slug));
+    }
+
+    @PutMapping("/{slug}")
+    public ResponseEntity<ArticleDto> updateArticle(@PathVariable String slug,
+                                                    @Valid @RequestBody UpdateArticleDto updateArticleDto) {
+        Article article = articleService.getArticleBySlug(slug);
+        return ResponseEntity.ok(articleService.updateUser(updateArticleDto, article));
+    }
+
+    @DeleteMapping("/{slug}")
+    public void deleteArticle(@PathVariable String slug) {
+        Article article = articleService.getArticleBySlug(slug);
+        articleService.deleteUser(article);
     }
 }

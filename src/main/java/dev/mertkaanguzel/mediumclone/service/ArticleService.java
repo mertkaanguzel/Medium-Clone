@@ -2,12 +2,14 @@ package dev.mertkaanguzel.mediumclone.service;
 
 import dev.mertkaanguzel.mediumclone.dto.ArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
+import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
 import dev.mertkaanguzel.mediumclone.exception.ArticleNotFoundException;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.ArticleRepository;
 import dev.mertkaanguzel.mediumclone.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +40,34 @@ public class ArticleService {
         return ArticleDto.fromArticle(articleRepository.saveAndFlush(article));
     }
 
-    public ArticleDto getArticleBySlug(String slug, String username) {
+    public Article getArticleBySlug(String slug) {
         //UserAccount author = userService.getUserByUserName(username);
         //Article article = articleRepository.getArticleBySlug(slug);
         //article.setUser(author);
-        Article article = articleRepository.getArticleWithAuthorBySlug(slug)
+        return articleRepository.getArticleWithAuthorBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException("Article not found with given slug: " + slug));
-        return ArticleDto.fromArticle(article);
+    }
+
+    public ArticleDto findBySlug(String slug) {
+        return ArticleDto.fromArticle(getArticleBySlug(slug));
+    }
+
+    @PreAuthorize("#article.user.username == authentication.name")
+    public ArticleDto updateUser(UpdateArticleDto updateArticleDto, Article article) {
+        if (updateArticleDto.title() != null) {
+            article.setTitle(updateArticleDto.title());
+            article.setSlug(updateArticleDto.title().toLowerCase().replace(" ", "-"));
+
+        }
+        if (updateArticleDto.description() != null) article.setDescription(updateArticleDto.description());
+        if (updateArticleDto.body() != null) article.setBody(updateArticleDto.body());
+
+        return ArticleDto.fromArticle(articleRepository.save(article));
+    }
+
+    @PreAuthorize("#article.user.username == authentication.name")
+    public void deleteUser(Article article) {
+        articleRepository.delete(article);
     }
 /*
     @PostConstruct
