@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Objects;
 
 @Entity
+@Table(name = "Users")
 public class UserAccount {
     @Id
     @GeneratedValue
@@ -89,31 +90,4 @@ public class UserAccount {
     public void setImage(String image) {
         this.image = image;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserAccount user = (UserAccount) o;
-        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(bio, user.bio) && Objects.equals(image, user.image);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, username, password, email, bio, image);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", bio='" + bio + '\'' +
-                ", image='" + image + '\'' +
-                '}';
-    }
-
-
 }

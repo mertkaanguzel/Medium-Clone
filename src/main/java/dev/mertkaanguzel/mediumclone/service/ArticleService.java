@@ -28,7 +28,6 @@ public class ArticleService {
     public ArticleDto createArticle(CreateArticleDto createArticleDto, String username) {
         Article article = new Article(
                 userService.getUserByUserName(username),
-                createArticleDto.title().toLowerCase().replace(" ", "-"),
                 createArticleDto.title(),
                 createArticleDto.description(),
                 createArticleDto.body(),
@@ -54,11 +53,7 @@ public class ArticleService {
 
     @PreAuthorize("#article.user.username == authentication.name")
     public ArticleDto updateUser(UpdateArticleDto updateArticleDto, Article article) {
-        if (updateArticleDto.title() != null) {
-            article.setTitle(updateArticleDto.title());
-            article.setSlug(updateArticleDto.title().toLowerCase().replace(" ", "-"));
-
-        }
+        if (updateArticleDto.title() != null) article.setTitle(updateArticleDto.title());
         if (updateArticleDto.description() != null) article.setDescription(updateArticleDto.description());
         if (updateArticleDto.body() != null) article.setBody(updateArticleDto.body());
 

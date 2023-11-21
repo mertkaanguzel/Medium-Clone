@@ -6,9 +6,12 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
+@Table(name = "Articles")
 public class Article {
     @Id
     @GeneratedValue
@@ -20,6 +23,20 @@ public class Article {
     @JsonIgnore
     private UserAccount user;
 
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade =  {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            }
+    )
+    @JoinTable(
+            name = "Article_Tags",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "tag_id") }
+    )
+    private Set<Tag> tags = new HashSet<>();
+
     private String slug;
     private String title;
     private String description;
@@ -28,16 +45,16 @@ public class Article {
     private LocalDateTime updatedAt;
     private Integer favoritesCount;
 
-    public Article(UserAccount user, String slug, String title, String description, String body, LocalDateTime createdAt, LocalDateTime updatedAt, Integer favoritesCount) {
+    public Article(UserAccount user, String title, String description, String body, LocalDateTime createdAt, LocalDateTime updatedAt, Integer favoritesCount) {
         this.id = null;
         this.user = user;
-        this.slug = slug;
-        this.title = title;
         this.description = description;
         this.body = body;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.favoritesCount = favoritesCount;
+
+        setTitle(title);
     }
 
     protected Article() {
@@ -66,6 +83,7 @@ public class Article {
 
     public void setTitle(String title) {
         this.title = title;
+        setSlug(title.toLowerCase().replace(" ", "-"));
     }
 
     public String getDescription() {
@@ -116,31 +134,11 @@ public class Article {
         this.user = user;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Article article = (Article) o;
-        return Objects.equals(id, article.id) && Objects.equals(user, article.user) && Objects.equals(slug, article.slug) && Objects.equals(title, article.title) && Objects.equals(description, article.description) && Objects.equals(body, article.body) && Objects.equals(createdAt, article.createdAt) && Objects.equals(updatedAt, article.updatedAt) && Objects.equals(favoritesCount, article.favoritesCount);
+    public Set<Tag> getTags() {
+        return tags;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, user, slug, title, description, body, createdAt, updatedAt, favoritesCount);
-    }
-
-    @Override
-    public String toString() {
-        return "Article{" +
-                "id=" + id +
-                ", user=" + user +
-                ", slug='" + slug + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", body='" + body + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", favoritesCount=" + favoritesCount +
-                '}';
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 }
