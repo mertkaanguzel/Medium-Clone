@@ -8,7 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Objects;
 
 @Entity
-@Table(name = "Users")
+//@Table(name = "User")
 public class UserAccount {
     @Id
     @GeneratedValue

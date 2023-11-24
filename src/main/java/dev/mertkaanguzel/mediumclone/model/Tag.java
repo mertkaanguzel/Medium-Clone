@@ -7,13 +7,17 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Table(name = "Tags")
+//@Table(name = "Tag")
 @Entity
 public class Tag {
+    /*
     @Id
     @GeneratedValue
     private Long id;
 
+     */
+    @Id
+    //@Column(nullable = false, unique = true)
     private String name;
 
     @ManyToMany(
@@ -22,18 +26,18 @@ public class Tag {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
             },
-            mappedBy = "Tags"
+            mappedBy = "tags"
     )
     @JsonIgnore
     private Set<Article> articles = new HashSet<>();
     public Tag(String name) {
-        this.id = null;
+        //this.id = null;
         this.name = name;
     }
 
     protected Tag() {
     }
-
+/*
     public Long getId() {
         return id;
     }
@@ -41,7 +45,7 @@ public class Tag {
     public void setId(Long id) {
         this.id = id;
     }
-
+*/
     public String getName() {
         return name;
     }

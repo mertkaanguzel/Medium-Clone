@@ -5,24 +5,25 @@ import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
 import dev.mertkaanguzel.mediumclone.exception.ArticleNotFoundException;
 import dev.mertkaanguzel.mediumclone.model.Article;
-import dev.mertkaanguzel.mediumclone.model.UserAccount;
+import dev.mertkaanguzel.mediumclone.model.Tag;
 import dev.mertkaanguzel.mediumclone.repository.ArticleRepository;
-import dev.mertkaanguzel.mediumclone.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final UserService userService;
+    private final TagService tagService;
 
-    public ArticleService(ArticleRepository articleRepository, UserService userService) {
+    public ArticleService(ArticleRepository articleRepository, UserService userService, TagService tagService) {
         this.articleRepository = articleRepository;
         this.userService = userService;
+        this.tagService = tagService;
     }
 
     public ArticleDto createArticle(CreateArticleDto createArticleDto, String username) {
@@ -35,6 +36,8 @@ public class ArticleService {
                 null,
                 0
         );
+        article.setTags(new HashSet<>(tagService.createTags(createArticleDto.tagList())));
+        //createArticleDto.tagList().forEach(name -> article.getTags().add(new Tag(name)));
 
         return ArticleDto.fromArticle(articleRepository.saveAndFlush(article));
     }

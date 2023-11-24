@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "Articles")
+//@Table(name = "Article")
 public class Article {
     @Id
     @GeneratedValue

@@ -33,6 +33,8 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -76,6 +78,7 @@ public class SecurityConfig {
     SecurityFilterChain configureSecurity(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         return http
                 .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(toH2Console()).permitAll() //for testing in memory db h2
                         .requestMatchers(mvc.pattern("/api/users/**")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/articles/*")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/tags")).permitAll()
