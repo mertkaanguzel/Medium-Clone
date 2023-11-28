@@ -5,6 +5,7 @@ import dev.mertkaanguzel.mediumclone.dto.UpdateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -67,6 +68,18 @@ public class UserService {
         if (updateUserDto.image() != null) user.setImage(updateUserDto.image());
         if (updateUserDto.bio() != null) user.setBio(updateUserDto.bio());
 
+        return userRepository.save(user);
+    }
+
+    public UserAccount addFollower(String followed, String followee) {
+        UserAccount user = this.getUserByUserName(followed);
+        user.getFollowers().add(this.getUserByUserName(followee));
+        return userRepository.save(user);
+    }
+
+    public UserAccount deleteFollower(String followed, String followee) {
+        UserAccount user = this.getUserByUserName(followed);
+        user.getFollowers().remove(this.getUserByUserName(followee));
         return userRepository.save(user);
     }
 }

@@ -28,15 +28,16 @@ public class ArticleController {
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable String slug) {
-        return ResponseEntity.ok(articleService.findBySlug(slug));
+    public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable String slug, Principal principal) {
+        return ResponseEntity.ok(articleService.findBySlug(slug, principal.getName()));
     }
 
     @PutMapping("/{slug}")
     public ResponseEntity<ArticleDto> updateArticle(@PathVariable String slug,
-                                                    @Valid @RequestBody UpdateArticleDto updateArticleDto) {
+                                                    @Valid @RequestBody UpdateArticleDto updateArticleDto,
+                                                    Principal principal) {
         Article article = articleService.getArticleBySlug(slug);
-        return ResponseEntity.ok(articleService.updateUser(updateArticleDto, article));
+        return ResponseEntity.ok(articleService.updateUser(updateArticleDto, article, principal.getName()));
     }
 
     @DeleteMapping("/{slug}")

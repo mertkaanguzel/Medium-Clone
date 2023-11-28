@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 //@Table(name = "User")
@@ -21,6 +24,20 @@ public class UserAccount {
     private String email;
     private String bio;
     private String image;
+
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade =  {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            }
+    )
+    @JoinTable(
+            name = "User_Followers",
+            joinColumns = { @JoinColumn(name = "followed_id") },
+            inverseJoinColumns = { @JoinColumn(name = "follewee_id") }
+    )
+    private Set<UserAccount> followers = new HashSet<>();
 
     public UserAccount(String username, String password, String email, String bio, String image) {
         this.id = null;
@@ -89,5 +106,13 @@ public class UserAccount {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public Set<UserAccount> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<UserAccount> followers) {
+        this.followers = followers;
     }
 }

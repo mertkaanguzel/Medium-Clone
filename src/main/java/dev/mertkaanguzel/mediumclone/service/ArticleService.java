@@ -39,7 +39,7 @@ public class ArticleService {
         article.setTags(new HashSet<>(tagService.createTags(createArticleDto.tagList())));
         //createArticleDto.tagList().forEach(name -> article.getTags().add(new Tag(name)));
 
-        return ArticleDto.fromArticle(articleRepository.saveAndFlush(article));
+        return ArticleDto.fromArticle(articleRepository.saveAndFlush(article), username);
     }
 
     public Article getArticleBySlug(String slug) {
@@ -50,17 +50,17 @@ public class ArticleService {
                 .orElseThrow(() -> new ArticleNotFoundException("Article not found with given slug: " + slug));
     }
 
-    public ArticleDto findBySlug(String slug) {
-        return ArticleDto.fromArticle(getArticleBySlug(slug));
+    public ArticleDto findBySlug(String slug, String username) {
+        return ArticleDto.fromArticle(getArticleBySlug(slug), username);
     }
 
     @PreAuthorize("#article.user.username == authentication.name")
-    public ArticleDto updateUser(UpdateArticleDto updateArticleDto, Article article) {
+    public ArticleDto updateUser(UpdateArticleDto updateArticleDto, Article article, String username) {
         if (updateArticleDto.title() != null) article.setTitle(updateArticleDto.title());
         if (updateArticleDto.description() != null) article.setDescription(updateArticleDto.description());
         if (updateArticleDto.body() != null) article.setBody(updateArticleDto.body());
 
-        return ArticleDto.fromArticle(articleRepository.save(article));
+        return ArticleDto.fromArticle(articleRepository.save(article), username);
     }
 
     @PreAuthorize("#article.user.username == authentication.name")
