@@ -5,12 +5,12 @@ import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import java.util.Objects;
 
 public record ProfileDto(String username, String bio, String image, Boolean following) {
-    public static ProfileDto fromUserAccount(UserAccount profile, String username) {
+    public static ProfileDto fromUserAccount(UserAccount user, String username) {
         return new ProfileDto(
-                profile.getUsername(),
-                profile.getBio(),
-                profile.getImage(),
-                profile.getFollowers().stream().anyMatch(follower -> Objects.equals(follower.getUsername(), username))
+                user.getUsername(),
+                user.getBio(),
+                user.getImage(),
+                user.getFollowers().stream().anyMatch(follower -> Objects.equals(follower.getUsername(), username))
         );
     }
 }

@@ -46,7 +46,7 @@ public class ArticleService {
         //UserAccount author = userService.getUserByUserName(username);
         //Article article = articleRepository.getArticleBySlug(slug);
         //article.setUser(author);
-        return articleRepository.getArticleWithAuthorBySlug(slug)
+        return articleRepository.getArticleBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException("Article not found with given slug: " + slug));
     }
 
