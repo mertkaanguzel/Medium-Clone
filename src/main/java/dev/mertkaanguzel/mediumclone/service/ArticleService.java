@@ -67,6 +67,24 @@ public class ArticleService {
     public void deleteUser(Article article) {
         articleRepository.delete(article);
     }
+
+    public ArticleDto addFavorite(String slug, String username) {
+        Article article = getArticleBySlug(slug);
+
+        article.getFavoritedByList().add(userService.getUserByUserName(username));
+        article.setFavoritesCount(article.getFavoritesCount() + 1);
+
+        return ArticleDto.fromArticle(articleRepository.save(article), username);
+    }
+    //!!!! if user not fav, not del !!!!
+    public void deleteFavorite(String slug, String username) {
+        Article article = getArticleBySlug(slug);
+
+        boolean isIncluded = article.getFavoritedByList().remove(userService.getUserByUserName(username));
+        if (isIncluded) article.setFavoritesCount(article.getFavoritesCount() - 1);
+
+        articleRepository.save(article);
+    }
 /*
     @PostConstruct
     void initDatabase() {

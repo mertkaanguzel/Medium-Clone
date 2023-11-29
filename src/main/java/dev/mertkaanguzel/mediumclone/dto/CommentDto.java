@@ -4,7 +4,7 @@ import dev.mertkaanguzel.mediumclone.model.Comment;
 
 import java.time.LocalDateTime;
 
-public record CommentDto(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String body, ProfileDto profile) {
+public record CommentDto(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String body, ProfileDto author) {
     public static CommentDto fromComment(Comment comment, String username) {
         return new CommentDto(
                 comment.getId(),

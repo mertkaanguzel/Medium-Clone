@@ -2,6 +2,7 @@ package dev.mertkaanguzel.mediumclone.service;
 
 import dev.mertkaanguzel.mediumclone.dto.CommentDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateCommentDto;
+import dev.mertkaanguzel.mediumclone.exception.CommentNotFoundException;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.Comment;
 import dev.mertkaanguzel.mediumclone.repository.CommentRepository;
@@ -41,7 +42,8 @@ public class CommentService {
     }
 
     public Comment getComment(String slug, String id) {
-        return commentRepository.getByArticleSlugAndId(slug, Long.parseLong(id));
+        return commentRepository.getByArticleSlugAndId(slug, Long.parseLong(id))
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found with given slug"));
     }
 
     @PreAuthorize("#comment.user.username == authentication.name")

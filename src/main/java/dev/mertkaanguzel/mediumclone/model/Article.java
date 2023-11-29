@@ -37,6 +37,20 @@ public class Article {
     )
     private Set<Tag> tags = new HashSet<>();
 
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade =  {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            }
+    )
+    @JoinTable(
+            name = "Article_FavoritedBy",
+            joinColumns = { @JoinColumn(name = "article_id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+    )
+    private Set<UserAccount> favoritedByList = new HashSet<>();
+
     private String slug;
     private String title;
     private String description;
@@ -140,5 +154,13 @@ public class Article {
 
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
+    }
+
+    public Set<UserAccount> getFavoritedByList() {
+        return favoritedByList;
+    }
+
+    public void setFavoritedByList(Set<UserAccount> favoritedByList) {
+        this.favoritedByList = favoritedByList;
     }
 }

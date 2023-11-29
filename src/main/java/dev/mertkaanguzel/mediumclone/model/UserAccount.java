@@ -39,6 +39,17 @@ public class UserAccount {
     )
     private Set<UserAccount> followers = new HashSet<>();
 
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade =  {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "favoritedByList"
+    )
+    @JsonIgnore
+    private Set<Article> favoritedArticles = new HashSet<>();
+
     public UserAccount(String username, String password, String email, String bio, String image) {
         this.id = null;
         this.username = username;
@@ -114,5 +125,13 @@ public class UserAccount {
 
     public void setFollowers(Set<UserAccount> followers) {
         this.followers = followers;
+    }
+
+    public Set<Article> getFavoritedArticles() {
+        return favoritedArticles;
+    }
+
+    public void setFavoritedArticles(Set<Article> favoritedArticles) {
+        this.favoritedArticles = favoritedArticles;
     }
 }
