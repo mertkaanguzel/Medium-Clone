@@ -81,6 +81,7 @@ public class SecurityConfig {
                         .requestMatchers(toH2Console()).permitAll() //for testing in memory db h2
                         .requestMatchers(mvc.pattern("/api/users/**")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/articles/*")).permitAll()
+                        .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/articles")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/tags")).permitAll()
                         .anyRequest().authenticated()
                 )

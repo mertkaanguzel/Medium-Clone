@@ -13,4 +13,13 @@ public record ProfileDto(String username, String bio, String image, Boolean foll
                 user.getFollowers().stream().anyMatch(follower -> Objects.equals(follower.getUsername(), username))
         );
     }
+
+    public static ProfileDto fromUserAccount(UserAccount user) {
+        return new ProfileDto(
+                user.getUsername(),
+                user.getBio(),
+                user.getImage(),
+                false
+        );
+    }
 }

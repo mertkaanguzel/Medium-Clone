@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/articles")
@@ -29,7 +30,31 @@ public class ArticleController {
 
     @GetMapping("/{slug}")
     public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable String slug, Principal principal) {
+        if (principal == null) return ResponseEntity.ok(articleService.findBySlug(slug));
+
         return ResponseEntity.ok(articleService.findBySlug(slug, principal.getName()));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ArticleDto>> getArticles(@RequestParam(value = "tag", required = false) String tag,
+                                                        @RequestParam(value = "author", required = false) String author,
+                                                        @RequestParam(value = "favorited", required = false) String favoritedBy,
+                                                        @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
+                                                        @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                                        Principal principal) {
+        if (principal == null) return ResponseEntity.ok(articleService.findArticles(tag, author,
+                favoritedBy, limit, offset));
+
+        return ResponseEntity.ok(articleService.findArticles(tag, author, favoritedBy,
+                limit, offset, principal.getName()));
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<List<ArticleDto>> getArticlesFeed(@RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
+                                                        @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                                        Principal principal) {
+
+        return ResponseEntity.ok(articleService.getFeed(limit, offset, principal.getName()));
     }
 
     @PutMapping("/{slug}")
