@@ -4,7 +4,9 @@ import dev.mertkaanguzel.mediumclone.config.OffsetBasedPageRequest;
 import dev.mertkaanguzel.mediumclone.dto.ArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
+import dev.mertkaanguzel.mediumclone.exception.ArticleAlreadyExistsException;
 import dev.mertkaanguzel.mediumclone.exception.ArticleNotFoundException;
+import dev.mertkaanguzel.mediumclone.exception.UserAlreadyExistsException;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.Tag;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
@@ -43,6 +45,10 @@ public class ArticleService {
         );
         article.setTags(new HashSet<>(tagService.createTags(createArticleDto.tagList())));
         //createArticleDto.tagList().forEach(name -> article.getTags().add(new Tag(name)));
+
+        if (articleRepository.getArticleBySlug(article.getSlug()).isPresent()) {
+            throw new ArticleAlreadyExistsException("Article already exists with given slug: " + article.getSlug());
+        }
 
         return ArticleDto.fromArticle(articleRepository.saveAndFlush(article), username);
     }
@@ -93,6 +99,7 @@ public class ArticleService {
         if (updateArticleDto.title() != null) article.setTitle(updateArticleDto.title());
         if (updateArticleDto.description() != null) article.setDescription(updateArticleDto.description());
         if (updateArticleDto.body() != null) article.setBody(updateArticleDto.body());
+        article.setUpdatedAt(LocalDateTime.now());
 
         return ArticleDto.fromArticle(articleRepository.save(article), username);
     }

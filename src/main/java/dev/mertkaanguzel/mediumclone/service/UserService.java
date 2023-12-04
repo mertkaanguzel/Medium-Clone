@@ -3,6 +3,7 @@ package dev.mertkaanguzel.mediumclone.service;
 import dev.mertkaanguzel.mediumclone.dto.CreateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.UserDto;
+import dev.mertkaanguzel.mediumclone.exception.UserAlreadyExistsException;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.UserRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +37,10 @@ public class UserService {
     }
 
     public UserAccount createUser(CreateUserDto createUserDto) {
+        if (userRepository.findByEmail(createUserDto.email()).isPresent()) {
+            throw new UserAlreadyExistsException("User already exists with given email: " + createUserDto.email());
+        }
+
         UserAccount user = new UserAccount(
                 createUserDto.username(),
                 passwordEncoder.encode(createUserDto.password()),
