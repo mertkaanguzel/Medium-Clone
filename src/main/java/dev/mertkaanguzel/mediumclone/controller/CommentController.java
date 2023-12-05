@@ -2,7 +2,6 @@ package dev.mertkaanguzel.mediumclone.controller;
 
 import dev.mertkaanguzel.mediumclone.dto.CommentDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateCommentDto;
-import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.Comment;
 import dev.mertkaanguzel.mediumclone.service.CommentService;
 import jakarta.validation.Valid;
@@ -25,17 +24,17 @@ public class CommentController {
     public ResponseEntity<CommentDto> addComment(@PathVariable String slug,
                                                  @Valid @RequestBody CreateCommentDto createCommentDto,
                                                  Principal principal) {
-        return ResponseEntity.ok(commentService.addComment(createCommentDto, slug, principal.getName()));
+        return ResponseEntity.ok(commentService.createComment(createCommentDto, slug, principal.getName()));
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentDto>> getComment(@PathVariable String slug, Principal principal) {
+    public ResponseEntity<List<CommentDto>> getComments(@PathVariable String slug, Principal principal) {
         return ResponseEntity.ok(commentService.getComments(slug, principal.getName()));
     }
 
     @DeleteMapping("/{id}")
     public void deleteComment(@PathVariable String slug, @PathVariable String id) {
-        Comment comment = commentService.getComment(slug, id);
+        Comment comment = commentService.findComment(slug, id);
         commentService.deleteComment(comment);
     }
 }

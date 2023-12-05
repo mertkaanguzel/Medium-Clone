@@ -6,33 +6,32 @@ import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.exception.UserAlreadyExistsException;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.UserRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Optional;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Clock clock) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserAccount getUserByUserName(String username) {
+    public UserAccount findUserByName(String username) {
 
-        return userRepository.getUserByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with given username: " + username));
     }
 
-    public UserDto findByUserName(String username, String token) {
-        UserAccount user = this.getUserByUserName(username);
+    public UserDto getUserByName(String username, String token) {
+        UserAccount user = this.findUserByName(username);
         return UserDto.fromUserAccount(user, token);
     }
 
@@ -51,7 +50,7 @@ public class UserService {
     }
 
     public UserAccount updateUser(UpdateUserDto updateUserDto, String username) {
-        UserAccount user = this.getUserByUserName(username);
+        UserAccount user = this.findUserByName(username);
         /*
         try {
             for (Field field : UpdateUserDto.class.getDeclaredFields()) {
@@ -77,14 +76,14 @@ public class UserService {
     }
 
     public UserAccount addFollower(String followed, String followee) {
-        UserAccount user = this.getUserByUserName(followed);
-        user.getFollowers().add(this.getUserByUserName(followee));
+        UserAccount user = this.findUserByName(followed);
+        user.getFollowers().add(this.findUserByName(followee));
         return userRepository.save(user);
     }
 
     public UserAccount deleteFollower(String followed, String followee) {
-        UserAccount user = this.getUserByUserName(followed);
-        user.getFollowers().remove(this.getUserByUserName(followee));
+        UserAccount user = this.findUserByName(followed);
+        user.getFollowers().remove(this.findUserByName(followee));
         return userRepository.save(user);
     }
 }

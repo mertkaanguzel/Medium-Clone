@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> getAllByArticleSlug(String slug);
-    Optional<Comment> getByArticleSlugAndId(String slug, Long id);
+    List<Comment> findAllByArticleSlug(String slug);
+
+    Optional<Comment> findByArticleSlugAndId(String slug, Long id);
 }

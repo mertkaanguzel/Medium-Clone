@@ -6,91 +6,91 @@ import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
 import dev.mertkaanguzel.mediumclone.exception.ArticleAlreadyExistsException;
 import dev.mertkaanguzel.mediumclone.exception.ArticleNotFoundException;
-import dev.mertkaanguzel.mediumclone.exception.UserAlreadyExistsException;
 import dev.mertkaanguzel.mediumclone.model.Article;
-import dev.mertkaanguzel.mediumclone.model.Tag;
-import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.ArticleRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final UserService userService;
     private final TagService tagService;
+    private final Clock clock;
 
-    public ArticleService(ArticleRepository articleRepository, UserService userService, TagService tagService) {
+    public ArticleService(ArticleRepository articleRepository, UserService userService, TagService tagService, Clock clock) {
         this.articleRepository = articleRepository;
         this.userService = userService;
         this.tagService = tagService;
+        this.clock = clock;
     }
 
     public ArticleDto createArticle(CreateArticleDto createArticleDto, String username) {
         Article article = new Article(
-                userService.getUserByUserName(username),
+                userService.findUserByName(username),
                 createArticleDto.title(),
                 createArticleDto.description(),
                 createArticleDto.body(),
-                LocalDateTime.now(),
+                getLocalDateTimeNow(),
                 null,
                 0
         );
         article.setTags(new HashSet<>(tagService.createTags(createArticleDto.tagList())));
         //createArticleDto.tagList().forEach(name -> article.getTags().add(new Tag(name)));
 
-        if (articleRepository.getArticleBySlug(article.getSlug()).isPresent()) {
+        if (articleRepository.findBySlug(article.getSlug()).isPresent()) {
             throw new ArticleAlreadyExistsException("Article already exists with given slug: " + article.getSlug());
         }
 
         return ArticleDto.fromArticle(articleRepository.saveAndFlush(article), username);
     }
 
-    public Article getArticleBySlug(String slug) {
+    public Article findArticleBySlug(String slug) {
         //UserAccount author = userService.getUserByUserName(username);
         //Article article = articleRepository.getArticleBySlug(slug);
         //article.setUser(author);
-        return articleRepository.getArticleBySlug(slug)
+        return articleRepository.findBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException("Article not found with given slug: " + slug));
     }
 
-    public ArticleDto findBySlug(String slug, String username) {
-        return ArticleDto.fromArticle(getArticleBySlug(slug), username);
+    public ArticleDto getArticleBySlug(String slug, String username) {
+        return ArticleDto.fromArticle(findArticleBySlug(slug), username);
     }
 
-    public ArticleDto findBySlug(String slug) {
-        return ArticleDto.fromArticle(getArticleBySlug(slug));
+    public ArticleDto getArticleBySlug(String slug) {
+        return ArticleDto.fromArticle(findArticleBySlug(slug));
     }
 
-    public List<ArticleDto> findArticles(String tag, String author,
-                                         String favoritedBy, int limit,
-                                         int offset, String username) {
+    public List<ArticleDto> getArticles(String tag, String author,
+                                        String favoritedBy, int limit,
+                                        int offset, String username) {
         Pageable pageable = PageRequest.of(offset, limit);
 
-        return articleRepository.findByParams(tag, author, favoritedBy, pageable)
+        return articleRepository.findAllByParams(tag, author, favoritedBy, pageable)
                 .stream().map(article -> ArticleDto.fromArticle(article, username)).toList();
     }
 
-    public List<ArticleDto> findArticles(String tag, String author,
-                                         String favoritedBy, int limit,
-                                         int offset) {
+    public List<ArticleDto> getArticles(String tag, String author,
+                                        String favoritedBy, int limit,
+                                        int offset) {
         Pageable pageable = new OffsetBasedPageRequest(offset, limit);
 
-        return articleRepository.findByParams(tag, author, favoritedBy, pageable)
+        return articleRepository.findAllByParams(tag, author, favoritedBy, pageable)
                 .stream().map(ArticleDto::fromArticle).toList();
     }
 
-    public List<ArticleDto> getFeed(int limit, int offset, String username) {
+    public List<ArticleDto> getArticlesFeed(int limit, int offset, String username) {
         Pageable pageable = new OffsetBasedPageRequest(offset, limit);
 
-        return articleRepository.getFeed(username, pageable)
+        return articleRepository.findFeed(username, pageable)
                 .stream().map(article -> ArticleDto.fromArticle(article, username)).toList();
     }
 
@@ -99,7 +99,7 @@ public class ArticleService {
         if (updateArticleDto.title() != null) article.setTitle(updateArticleDto.title());
         if (updateArticleDto.description() != null) article.setDescription(updateArticleDto.description());
         if (updateArticleDto.body() != null) article.setBody(updateArticleDto.body());
-        article.setUpdatedAt(LocalDateTime.now());
+        article.setUpdatedAt(getLocalDateTimeNow());
 
         return ArticleDto.fromArticle(articleRepository.save(article), username);
     }
@@ -110,21 +110,29 @@ public class ArticleService {
     }
 
     public ArticleDto addFavorite(String slug, String username) {
-        Article article = getArticleBySlug(slug);
+        Article article = findArticleBySlug(slug);
 
-        article.getFavoritedByList().add(userService.getUserByUserName(username));
+        article.getFavoritedByList().add(userService.findUserByName(username));
         article.setFavoritesCount(article.getFavoritesCount() + 1);
 
         return ArticleDto.fromArticle(articleRepository.save(article), username);
     }
-    //!!!! if user not fav, not del !!!!
-    public void deleteFavorite(String slug, String username) {
-        Article article = getArticleBySlug(slug);
 
-        boolean isIncluded = article.getFavoritedByList().remove(userService.getUserByUserName(username));
+    public void deleteFavorite(String slug, String username) {
+        Article article = findArticleBySlug(slug);
+
+        boolean isIncluded = article.getFavoritedByList().remove(userService.findUserByName(username));
         if (isIncluded) article.setFavoritesCount(article.getFavoritesCount() - 1);
 
         articleRepository.save(article);
+    }
+
+    private LocalDateTime getLocalDateTimeNow() {
+        Instant instant = clock.instant();
+        return LocalDateTime.ofInstant(
+                instant,
+                Clock.systemDefaultZone().getZone()
+        );
     }
 /*
     @PostConstruct

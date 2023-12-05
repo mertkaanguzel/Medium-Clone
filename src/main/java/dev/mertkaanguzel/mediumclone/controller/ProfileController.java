@@ -22,7 +22,7 @@ public class ProfileController {
 
     @GetMapping("/{username}")
     public ResponseEntity<ProfileDto> getProfile(@PathVariable String username, Principal principal) {
-        return ResponseEntity.ok(ProfileDto.fromUserAccount(userService.getUserByUserName(username), principal.getName()));
+        return ResponseEntity.ok(ProfileDto.fromUserAccount(userService.findUserByName(username), principal.getName()));
     }
 
     @PostMapping("/{username}/follow")

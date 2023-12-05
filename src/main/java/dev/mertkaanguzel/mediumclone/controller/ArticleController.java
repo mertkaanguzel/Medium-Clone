@@ -4,7 +4,6 @@ import dev.mertkaanguzel.mediumclone.dto.ArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
 import dev.mertkaanguzel.mediumclone.model.Article;
-import dev.mertkaanguzel.mediumclone.repository.UserRepository;
 import dev.mertkaanguzel.mediumclone.service.ArticleService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +29,9 @@ public class ArticleController {
 
     @GetMapping("/{slug}")
     public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable String slug, Principal principal) {
-        if (principal == null) return ResponseEntity.ok(articleService.findBySlug(slug));
+        if (principal == null) return ResponseEntity.ok(articleService.getArticleBySlug(slug));
 
-        return ResponseEntity.ok(articleService.findBySlug(slug, principal.getName()));
+        return ResponseEntity.ok(articleService.getArticleBySlug(slug, principal.getName()));
     }
 
     @GetMapping
@@ -42,10 +41,10 @@ public class ArticleController {
                                                         @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
                                                         @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
                                                         Principal principal) {
-        if (principal == null) return ResponseEntity.ok(articleService.findArticles(tag, author,
+        if (principal == null) return ResponseEntity.ok(articleService.getArticles(tag, author,
                 favoritedBy, limit, offset));
 
-        return ResponseEntity.ok(articleService.findArticles(tag, author, favoritedBy,
+        return ResponseEntity.ok(articleService.getArticles(tag, author, favoritedBy,
                 limit, offset, principal.getName()));
     }
 
@@ -54,20 +53,20 @@ public class ArticleController {
                                                         @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
                                                         Principal principal) {
 
-        return ResponseEntity.ok(articleService.getFeed(limit, offset, principal.getName()));
+        return ResponseEntity.ok(articleService.getArticlesFeed(limit, offset, principal.getName()));
     }
 
     @PutMapping("/{slug}")
     public ResponseEntity<ArticleDto> updateArticle(@PathVariable String slug,
                                                     @Valid @RequestBody UpdateArticleDto updateArticleDto,
                                                     Principal principal) {
-        Article article = articleService.getArticleBySlug(slug);
+        Article article = articleService.findArticleBySlug(slug);
         return ResponseEntity.ok(articleService.updateUser(updateArticleDto, article, principal.getName()));
     }
 
     @DeleteMapping("/{slug}")
     public void deleteArticle(@PathVariable String slug) {
-        Article article = articleService.getArticleBySlug(slug);
+        Article article = articleService.findArticleBySlug(slug);
         articleService.deleteUser(article);
     }
 }

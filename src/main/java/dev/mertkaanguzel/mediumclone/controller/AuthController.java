@@ -33,14 +33,14 @@ public class AuthController {
     public ResponseEntity<UserDto> register(@Valid @RequestBody CreateUserDto createUserDto) {
         UserAccount user = userService.createUser(createUserDto);
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(createUserDto.email(), createUserDto.password()));
-        UserDto userDto = UserDto.fromUserAccount(user, authService.generateToken(authentication));
-        return ResponseEntity.ok(userDto);
+
+        return ResponseEntity.ok(UserDto.fromUserAccount(user, authService.generateToken(authentication)));
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@Valid @RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password()));
 
-        return ResponseEntity.ok(userService.findByUserName(authentication.getName(), authService.generateToken(authentication)));
+        return ResponseEntity.ok(userService.getUserByName(authentication.getName(), authService.generateToken(authentication)));
     }
 }

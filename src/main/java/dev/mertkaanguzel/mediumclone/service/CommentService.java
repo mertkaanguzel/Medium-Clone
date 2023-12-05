@@ -3,7 +3,6 @@ package dev.mertkaanguzel.mediumclone.service;
 import dev.mertkaanguzel.mediumclone.dto.CommentDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateCommentDto;
 import dev.mertkaanguzel.mediumclone.exception.CommentNotFoundException;
-import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.Comment;
 import dev.mertkaanguzel.mediumclone.repository.CommentRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,10 +23,10 @@ public class CommentService {
         this.articleService = articleService;
     }
 
-    public CommentDto addComment(CreateCommentDto createCommentDto, String slug, String username) {
+    public CommentDto createComment(CreateCommentDto createCommentDto, String slug, String username) {
         Comment comment = new Comment(
-                userService.getUserByUserName(username),
-                articleService.getArticleBySlug(slug),
+                userService.findUserByName(username),
+                articleService.findArticleBySlug(slug),
                 createCommentDto.body(),
                 LocalDateTime.now(),
                 null
@@ -37,12 +36,12 @@ public class CommentService {
     }
 
     public List<CommentDto> getComments(String slug, String username) {
-        return commentRepository.getAllByArticleSlug(slug)
+        return commentRepository.findAllByArticleSlug(slug)
                 .stream().map(comment -> CommentDto.fromComment(comment, username)).toList();
     }
 
-    public Comment getComment(String slug, String id) {
-        return commentRepository.getByArticleSlugAndId(slug, Long.parseLong(id))
+    public Comment findComment(String slug, String id) {
+        return commentRepository.findByArticleSlugAndId(slug, Long.parseLong(id))
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found with given slug"));
     }
 
