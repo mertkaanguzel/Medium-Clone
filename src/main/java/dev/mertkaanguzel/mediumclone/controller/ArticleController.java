@@ -61,12 +61,12 @@ public class ArticleController {
                                                     @Valid @RequestBody UpdateArticleDto updateArticleDto,
                                                     Principal principal) {
         Article article = articleService.findArticleBySlug(slug);
-        return ResponseEntity.ok(articleService.updateUser(updateArticleDto, article, principal.getName()));
+        return ResponseEntity.ok(articleService.updateArticle(updateArticleDto, article, principal.getName()));
     }
 
     @DeleteMapping("/{slug}")
     public void deleteArticle(@PathVariable String slug) {
         Article article = articleService.findArticleBySlug(slug);
-        articleService.deleteUser(article);
+        articleService.deleteArticle(article);
     }
 }

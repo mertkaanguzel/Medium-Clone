@@ -24,7 +24,7 @@ public class FavoriteController {
 
     @DeleteMapping
     public void unfavorite(@PathVariable String slug, Principal principal) {
-        articleService.deleteFavorite(slug, principal.getName());
+        articleService.removeFavorite(slug, principal.getName());
     }
 
 }

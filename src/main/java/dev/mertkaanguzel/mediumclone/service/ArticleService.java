@@ -8,7 +8,6 @@ import dev.mertkaanguzel.mediumclone.exception.ArticleAlreadyExistsException;
 import dev.mertkaanguzel.mediumclone.exception.ArticleNotFoundException;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.repository.ArticleRepository;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -72,7 +71,7 @@ public class ArticleService {
     public List<ArticleDto> getArticles(String tag, String author,
                                         String favoritedBy, int limit,
                                         int offset, String username) {
-        Pageable pageable = PageRequest.of(offset, limit);
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit);
 
         return articleRepository.findAllByParams(tag, author, favoritedBy, pageable)
                 .stream().map(article -> ArticleDto.fromArticle(article, username)).toList();
@@ -95,7 +94,7 @@ public class ArticleService {
     }
 
     @PreAuthorize("#article.user.username == authentication.name")
-    public ArticleDto updateUser(UpdateArticleDto updateArticleDto, Article article, String username) {
+    public ArticleDto updateArticle(UpdateArticleDto updateArticleDto, Article article, String username) {
         if (updateArticleDto.title() != null) article.setTitle(updateArticleDto.title());
         if (updateArticleDto.description() != null) article.setDescription(updateArticleDto.description());
         if (updateArticleDto.body() != null) article.setBody(updateArticleDto.body());
@@ -105,7 +104,7 @@ public class ArticleService {
     }
 
     @PreAuthorize("#article.user.username == authentication.name")
-    public void deleteUser(Article article) {
+    public void deleteArticle(Article article) {
         articleRepository.delete(article);
     }
 
@@ -114,15 +113,17 @@ public class ArticleService {
 
         article.getFavoritedByList().add(userService.findUserByName(username));
         article.setFavoritesCount(article.getFavoritesCount() + 1);
+        article.setUpdatedAt(getLocalDateTimeNow());
 
         return ArticleDto.fromArticle(articleRepository.save(article), username);
     }
 
-    public void deleteFavorite(String slug, String username) {
+    public void removeFavorite(String slug, String username) {
         Article article = findArticleBySlug(slug);
 
         boolean isIncluded = article.getFavoritedByList().remove(userService.findUserByName(username));
         if (isIncluded) article.setFavoritesCount(article.getFavoritesCount() - 1);
+        article.setUpdatedAt(getLocalDateTimeNow());
 
         articleRepository.save(article);
     }
