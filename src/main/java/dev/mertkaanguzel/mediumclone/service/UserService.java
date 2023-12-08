@@ -4,6 +4,7 @@ import dev.mertkaanguzel.mediumclone.dto.CreateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.exception.UserAlreadyExistsException;
+import dev.mertkaanguzel.mediumclone.exception.UserNotFoundException;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Clock clock) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -27,7 +28,7 @@ public class UserService {
     public UserAccount findUserByName(String username) {
 
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with given username: " + username));
+                .orElseThrow(() -> new UserNotFoundException("User not found with given username: " + username));
     }
 
     public UserDto getUserByName(String username, String token) {

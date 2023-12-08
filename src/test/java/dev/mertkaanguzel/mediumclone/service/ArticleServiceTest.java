@@ -10,6 +10,7 @@ import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.model.UserAccount;
 import dev.mertkaanguzel.mediumclone.repository.ArticleRepository;
 import org.junit.jupiter.api.*;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Clock;
 import java.util.HashSet;
@@ -61,18 +62,19 @@ public class ArticleServiceTest {
 
         when(userService.findUserByName(anyString())).thenReturn(user);
         when(articleRepository.findBySlug(anyString())).thenReturn(Optional.of(article));
+        when(articleRepository.saveAndFlush(any(Article.class))).thenAnswer(i -> i.getArguments()[0]);
 
         assertThrows(ArticleAlreadyExistsException.class, () -> articleService.createArticle(createArticleDto, username));
     }
 
     @Test
     void testCreateArticle_whenArticleSlugNotExist_shouldCreateArticle() {
-        CreateArticleDto createArticleDto = new CreateArticleDto("Did you train your dragon?",
+        CreateArticleDto createArticleDto = new CreateArticleDto("How to train your dragon?",
                 "Ever wonder how?", "It takes a Jacobian", null);
 
         when(userService.findUserByName(anyString())).thenReturn(user);
         when(articleRepository.findBySlug(anyString())).thenReturn(Optional.empty());
-        when(articleRepository.saveAndFlush(any(Article.class))).thenReturn(article);
+        when(articleRepository.saveAndFlush(any(Article.class))).thenAnswer(i -> i.getArguments()[0]);
 
         ArticleDto result = articleService.createArticle(createArticleDto, username);
         assertEquals(articleDto, result);
@@ -128,6 +130,17 @@ public class ArticleServiceTest {
     }
 
     @Test
+    void testGetArticlesFeed_shouldReturnListOfArticleDto() {
+        List<ArticleDto> articleDtoList = List.of(articleDto);
+
+
+        when(articleRepository.findFeed(anyString(), any(Pageable.class))).thenReturn(List.of(article));
+        List<ArticleDto> result = articleService.getArticlesFeed(1, 0, username);
+
+        assertEquals(articleDtoList, result);
+    }
+
+    @Test
     void testupdateArticle_shouldReturnArticleDto() {
         ArticleDto updatedArticleDto = new ArticleDto("did-you-train-your-dragon?", "Did you train your dragon?",
                 "Ever wonder how?", "It takes a Jacobian", List.of(), getLocalDateTime(),
@@ -135,7 +148,7 @@ public class ArticleServiceTest {
         UpdateArticleDto updateArticleDto = new UpdateArticleDto("Did you train your dragon?",
                 null, null);
 
-        when(articleRepository.save(any(Article.class))).thenReturn(article);
+        when(articleRepository.save(any(Article.class))).thenAnswer(i -> i.getArguments()[0]);
         ArticleDto result = articleService.updateArticle(updateArticleDto, article, username);
 
         assertEquals(updatedArticleDto, result);
@@ -149,7 +162,7 @@ public class ArticleServiceTest {
 
         when(articleRepository.findBySlug(anyString())).thenReturn(Optional.of(article));
         when(userService.findUserByName(anyString())).thenReturn(user);
-        when(articleRepository.save(any(Article.class))).thenReturn(article);
+        when(articleRepository.save(any(Article.class))).thenAnswer(i -> i.getArguments()[0]);
 
         ArticleDto result = articleService.addFavorite(article.getSlug(), username);
 
