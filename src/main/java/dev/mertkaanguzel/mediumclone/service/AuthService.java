@@ -4,27 +4,28 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwsHeader;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
     private final JwtEncoder encoder;
+    private final Clock clock;
 
-    public AuthService(JwtEncoder encoder) {
+    public AuthService(JwtEncoder encoder, Clock clock) {
         this.encoder = encoder;
+        this.clock = clock;
     }
 
     public String generateToken(Authentication authentication) {
-        Instant now = Instant.now();
+        Instant now = getInstant();//Instant.now();
 
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -46,5 +47,9 @@ public class AuthService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         return jwtAuthenticationToken.getToken().getTokenValue();
+    }
+
+    private Instant getInstant() {
+        return clock.instant();
     }
 }
