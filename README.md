@@ -8,16 +8,9 @@
 
 This codebase was created to demonstrate a **Medium.com Clone API** built with **Spring Boot** including CRUD operations, authentication, various entity relations, unit testing, pagination and more.
 
-We've gone to great lengths to adhere to the **[YOUR_FRAMEWORK]** community styleguides & best practices.
+## How it works
 
-For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
+>  **Entity Relationship Diagram**
 
+# ![RealWorld Example App](diagram.png)
 
-# How it works
-
-> Describe the general architecture of your app here
-
-
-# Getting started
-
-> npm install, npm start, etc.use esc then tab to move
