@@ -4,6 +4,7 @@ import dev.mertkaanguzel.mediumclone.dto.UpdateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.service.AuthService;
 import dev.mertkaanguzel.mediumclone.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/user")
+@SecurityRequirement(name = "mediumapi")
 public class UserController {
     private final UserService userService;
     private final AuthService authService;

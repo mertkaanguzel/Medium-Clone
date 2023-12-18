@@ -3,6 +3,7 @@ package dev.mertkaanguzel.mediumclone.controller;
 import dev.mertkaanguzel.mediumclone.dto.ProfileDto;
 import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/profiles")
+@SecurityRequirement(name = "mediumapi")
 public class ProfileController {
     private final UserService userService;
 

@@ -80,6 +80,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(toH2Console()).permitAll() //for testing in memory db h2
                         .requestMatchers(mvc.pattern("/api/users/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/articles/*")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/articles")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/tags")).permitAll()

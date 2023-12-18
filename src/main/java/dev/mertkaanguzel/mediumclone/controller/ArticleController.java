@@ -5,6 +5,7 @@ import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.service.ArticleService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class ArticleController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "mediumapi")
     public ResponseEntity<ArticleDto> createArticle(@Valid @RequestBody CreateArticleDto createArticleDto,
                                                     Principal principal) {
         return ResponseEntity.ok(articleService.createArticle(createArticleDto, principal.getName()));
@@ -49,6 +51,7 @@ public class ArticleController {
     }
 
     @GetMapping("/feed")
+    @SecurityRequirement(name = "mediumapi")
     public ResponseEntity<List<ArticleDto>> getArticlesFeed(@RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
                                                         @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
                                                         Principal principal) {
@@ -57,6 +60,7 @@ public class ArticleController {
     }
 
     @PutMapping("/{slug}")
+    @SecurityRequirement(name = "mediumapi")
     public ResponseEntity<ArticleDto> updateArticle(@PathVariable String slug,
                                                     @Valid @RequestBody UpdateArticleDto updateArticleDto,
                                                     Principal principal) {
@@ -65,6 +69,7 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{slug}")
+    @SecurityRequirement(name = "mediumapi")
     public void deleteArticle(@PathVariable String slug) {
         Article article = articleService.findArticleBySlug(slug);
         articleService.deleteArticle(article);

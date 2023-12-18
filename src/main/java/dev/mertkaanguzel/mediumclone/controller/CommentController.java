@@ -4,6 +4,7 @@ import dev.mertkaanguzel.mediumclone.dto.CommentDto;
 import dev.mertkaanguzel.mediumclone.dto.CreateCommentDto;
 import dev.mertkaanguzel.mediumclone.model.Comment;
 import dev.mertkaanguzel.mediumclone.service.CommentService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/articles/{slug}/comments")
+@SecurityRequirement(name = "mediumapi")
 public class CommentController {
     private final CommentService commentService;
 

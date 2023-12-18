@@ -2,6 +2,7 @@ package dev.mertkaanguzel.mediumclone.controller;
 
 import dev.mertkaanguzel.mediumclone.dto.ArticleDto;
 import dev.mertkaanguzel.mediumclone.service.ArticleService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +10,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/articles/{slug}/favorite")
+@SecurityRequirement(name = "mediumapi")
 public class FavoriteController {
     private final ArticleService articleService;
 
