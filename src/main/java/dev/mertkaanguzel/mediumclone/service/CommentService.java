@@ -8,6 +8,8 @@ import dev.mertkaanguzel.mediumclone.repository.CommentRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,11 +18,13 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final ArticleService articleService;
+    private final Clock clock;
 
-    public CommentService(CommentRepository commentRepository, UserService userService, ArticleService articleService) {
+    public CommentService(CommentRepository commentRepository, UserService userService, ArticleService articleService, Clock clock) {
         this.commentRepository = commentRepository;
         this.userService = userService;
         this.articleService = articleService;
+        this.clock = clock;
     }
 
     public CommentDto createComment(CreateCommentDto createCommentDto, String slug, String username) {
@@ -28,7 +32,7 @@ public class CommentService {
                 userService.findUserByName(username),
                 articleService.findArticleBySlug(slug),
                 createCommentDto.body(),
-                LocalDateTime.now(),
+                getLocalDateTimeNow(),
                 null
         );
 
@@ -48,5 +52,13 @@ public class CommentService {
     @PreAuthorize("#comment.user.username == authentication.name")
     public void deleteComment(Comment comment) {
         commentRepository.delete(comment);
+    }
+
+    private LocalDateTime getLocalDateTimeNow() {
+        Instant instant = clock.instant();
+        return LocalDateTime.ofInstant(
+                instant,
+                Clock.systemDefaultZone().getZone()
+        );
     }
 }
