@@ -1,12 +1,18 @@
 package dev.mertkaanguzel.mediumclone.exception;
 
 
+import dev.mertkaanguzel.mediumclone.model.UserAccount;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.validation.FieldError;
@@ -62,4 +68,23 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> articleAlreadyExistsExceptionHandler(ArticleAlreadyExistsException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
+/*
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<?> AuthenticationFailureHandler(AuthenticationException exception,
+                                                          @NotNull HttpHeaders headers,
+                                                          @NotNull HttpStatusCode status,
+                                                          @NotNull WebRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> AccessDeniedHandler(AccessDeniedException exception,
+                                                          @NotNull HttpHeaders headers,
+                                                          @NotNull HttpStatusCode status,
+                                                          @NotNull WebRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    }
+    */
 }

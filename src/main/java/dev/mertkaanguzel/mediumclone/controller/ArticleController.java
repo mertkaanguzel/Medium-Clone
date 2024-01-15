@@ -5,6 +5,8 @@ import dev.mertkaanguzel.mediumclone.dto.CreateArticleDto;
 import dev.mertkaanguzel.mediumclone.dto.UpdateArticleDto;
 import dev.mertkaanguzel.mediumclone.model.Article;
 import dev.mertkaanguzel.mediumclone.service.ArticleService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +26,22 @@ public class ArticleController {
 
     @PostMapping
     @SecurityRequirement(name = "mediumapi")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Content"),
+            @ApiResponse(responseCode = "409", description = "Conflict"),
+    })
     public ResponseEntity<ArticleDto> createArticle(@Valid @RequestBody CreateArticleDto createArticleDto,
                                                     Principal principal) {
         return ResponseEntity.ok(articleService.createArticle(createArticleDto, principal.getName()));
     }
 
     @GetMapping("/{slug}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+    })
     public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable String slug, Principal principal) {
         if (principal == null) return ResponseEntity.ok(articleService.getArticleBySlug(slug));
 
@@ -37,6 +49,11 @@ public class ArticleController {
     }
 
     @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Content"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Content"),
+    })
     public ResponseEntity<List<ArticleDto>> getArticles(@RequestParam(value = "tag", required = false) String tag,
                                                         @RequestParam(value = "author", required = false) String author,
                                                         @RequestParam(value = "favorited", required = false) String favoritedBy,
@@ -52,6 +69,11 @@ public class ArticleController {
 
     @GetMapping("/feed")
     @SecurityRequirement(name = "mediumapi")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Content"),
+    })
     public ResponseEntity<List<ArticleDto>> getArticlesFeed(@RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
                                                         @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
                                                         Principal principal) {
@@ -61,6 +83,13 @@ public class ArticleController {
 
     @PutMapping("/{slug}")
     @SecurityRequirement(name = "mediumapi")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Content"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+    })
     public ResponseEntity<ArticleDto> updateArticle(@PathVariable String slug,
                                                     @Valid @RequestBody UpdateArticleDto updateArticleDto,
                                                     Principal principal) {
@@ -70,6 +99,12 @@ public class ArticleController {
 
     @DeleteMapping("/{slug}")
     @SecurityRequirement(name = "mediumapi")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+    })
     public void deleteArticle(@PathVariable String slug) {
         Article article = articleService.findArticleBySlug(slug);
         articleService.deleteArticle(article);

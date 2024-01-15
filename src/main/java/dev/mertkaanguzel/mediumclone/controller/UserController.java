@@ -4,6 +4,8 @@ import dev.mertkaanguzel.mediumclone.dto.UpdateUserDto;
 import dev.mertkaanguzel.mediumclone.dto.UserDto;
 import dev.mertkaanguzel.mediumclone.service.AuthService;
 import dev.mertkaanguzel.mediumclone.service.UserService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,10 @@ public class UserController {
     }
 
     @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+    })
     public ResponseEntity<UserDto> getUser(Principal principal) {
         return ResponseEntity.ok(UserDto.fromUserAccount(userService.findUserByName(principal.getName()),
                 authService.getToken()));
@@ -34,6 +40,11 @@ public class UserController {
 
     //??? @PreAuthorize("#entity.username == authentication.name") //?????
     @PutMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Content"),
+    })
     public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UpdateUserDto updateUserDto, Principal principal) {
         return ResponseEntity.ok(UserDto.fromUserAccount(userService.updateUser(updateUserDto, principal.getName()),
                 authService.getToken()));
