@@ -39,8 +39,8 @@ public class AuthService {
                 .claim("scope", scope)
                 .build();
 
-        var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
-        return this.encoder.encode(encoderParameters).getTokenValue();
+        //var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
+        return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
     public String getToken() {
