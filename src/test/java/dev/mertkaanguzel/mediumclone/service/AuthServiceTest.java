@@ -25,13 +25,11 @@ public class AuthServiceTest {
     private Authentication authentication;
     private SecurityContext securityContext;
     private final String jwtKey = "9faa372517ac1d389758d3750fc07acf00f542277f26fec1ce4593e93f64e338";
-    private final String expectedTokenString = "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiSmFjb2IiLCJleHAiOjE2OTgwODkyODAsImlhdCI6MTY5ODA4ODk4MCwic2NvcGUiOiJST0xFX1VTRVIifQ.pZctBbPyoT-CHTG4ENAHIESm7W4C-YUK60ghXAp4rt7n_OOZOtT1C-midGkm6Bvw18TjV01hj9kMD9dEDJFVSQ";
-
-
+    private final String expectedTokenString = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiSmFjb2IiLCJleHAiOjE2OTgwODkyODAsImlhdCI6MTY5ODA4ODk4MCwic2NvcGUiOiJST0xFX1VTRVIifQ.SLBRqvbmMgKoW52DmWVRuZc6W3RgNNSq0dh4Oy73BjR62Bs41S-8b1GRHsYQq5p0pHVvpDYmGlsCMiGXN_ys27O-HXDmVuyr0IrcD2CZcpX22Gw0smtMuORQVYw6_Fv-4ck8zHmdMPrjUF9FJP7OwdIUXGm-QnuAcrT2kjX-M2YaFd2MfEcqn_nJ9W24eKFu7-lshUURZlGJD60V2Ea0b5lwXe2_xcQLG7IyK-LhnijWWEhYz4E7c77Aa_6JbRqYX4nHmoF17Iu7t_74wqS7lmCFpi5aLA6J0UCANRyxcGaoX0Gy81TcGvY3PDkPnPhepqbT55ATWrV0o5nFSDpijQ";
     @BeforeEach
     void setUp() {
         jwtEncoder = mock(JwtEncoder.class);
-        NimbusJwtEncoder nimbusJwtEncoder = new NimbusJwtEncoder(new ImmutableSecret<>(jwtKey.getBytes()));
+        NimbusJwtEncoder nimbusJwtEncoder = encoder();
         when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenAnswer(mock -> nimbusJwtEncoder.encode(mock.getArgument(0)));
 
 
@@ -59,7 +57,7 @@ public class AuthServiceTest {
 
     @Test
     void testGetToken_shouldReturnTokenString() {
-        Authentication authentication = new JwtAuthenticationToken(getJwt());
+        Authentication authentication = new JwtAuthenticationToken(getJwt(encoder()));
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
