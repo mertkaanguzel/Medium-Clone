@@ -3,8 +3,7 @@
 > ### Spring Boot codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints) API spec.
 
 
-### [Demo](https://medium-clone-api.up.railway.app)
-
+### [Demo](https://medium-clone-kd9n.onrender.com/)
 
 This codebase was created to demonstrate a **Medium.com Clone API** built with **Spring Boot** including CRUD operations, authentication, various entity relations, unit testing, pagination, containerization and more.
 
